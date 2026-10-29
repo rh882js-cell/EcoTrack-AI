@@ -1,0 +1,216 @@
+:root {
+    --bg-dark: #0a0d0c;
+    --card-bg: #121815;
+    --accent-green: #00ff87;
+    --accent-green-glow: rgba(0, 255, 135, 0.25);
+    --text-primary: #e0e6e3;
+    --text-secondary: #8b9b94;
+    --border-color: #1e2823;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-image: radial-gradient(circle at 50% 0%, rgba(0, 255, 135, 0.08) 0%, transparent 60%);
+}
+
+.app-header {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.brand-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8rem;
+    color: var(--accent-green);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-shadow: 0 0 12px var(--accent-green-glow);
+}
+
+.gamification-badge {
+    background: linear-gradient(135deg, #18261e 0%, #0d1a12 100%);
+    border: 1px solid var(--accent-green);
+    padding: 8px 18px;
+    border-radius: 50px;
+    font-weight: 700;
+    color: var(--accent-green);
+    box-shadow: 0 0 15px var(--accent-green-glow);
+    transition: transform 0.3s ease;
+}
+
+.gamification-badge:hover {
+    transform: scale(1.05);
+}
+
+.main-layout {
+    width: 100%;
+    max-width: 900px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 25px;
+}
+
+@media (min-width: 768px) {
+    .main-layout {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: border-color 0.3s ease;
+}
+
+.card:hover {
+    border-color: rgba(0, 255, 135, 0.4);
+}
+
+.card-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Área del Scanner / Cámara */
+.scanner-view {
+    width: 100%;
+    height: 280px;
+    background: #000;
+    border-radius: 12px;
+    border: 2px dashed var(--border-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.scanner-view canvas {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+}
+
+.scan-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--accent-green);
+    box-shadow: inset 0 0 20px var(--accent-green-glow);
+    pointer-events: none;
+    display: none;
+}
+
+.scan-line {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--accent-green);
+    box-shadow: 0 0 15px var(--accent-green);
+    animation: scanAnim 2s infinite linear;
+    display: none;
+}
+
+@keyframes scanAnim {
+    0% { top: 0%; }
+    50% { top: 100%; }
+    100% { top: 0%; }
+}
+
+.btn-action {
+    width: 100%;
+    background: linear-gradient(135deg, #00ff87 0%, #60efff 100%);
+    color: #000;
+    font-weight: 700;
+    font-size: 1rem;
+    border: none;
+    padding: 15px;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 255, 135, 0.3);
+}
+
+.btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0, 255, 135, 0.5);
+}
+
+/* Estilos de Barras de Predicción */
+.pred-bar-container {
+    margin-bottom: 12px;
+}
+
+.pred-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.bar-bg {
+    width: 100%;
+    height: 10px;
+    background-color: #1a221e;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--accent-green);
+    box-shadow: 0 0 10px var(--accent-green);
+    border-radius: 10px;
+    transition: width 0.4s ease;
+}
+
+/* Tarjeta dinámica con consejos */
+.impact-card {
+    background: linear-gradient(180deg, rgba(0,255,135,0.05) 0%, rgba(0,0,0,0) 100%);
+    border-left: 4px solid var(--accent-green);
+}
+
+.impact-detail {
+    margin-top: 10px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.impact-detail strong {
+    color: #fff;
+}
