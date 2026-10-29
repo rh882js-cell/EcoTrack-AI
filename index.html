@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EcoTrack AI - Clasificador Ecológico</title>
+    <title>EcoTrack AI - Clasificador Ecológico Paraguay</title>
 
     <!-- Fuentes Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     
-    <!-- Enlace a la hoja de estilos externa -->
+    <!-- Hoja de estilos externa -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -18,7 +18,7 @@
     <!-- Encabezado con Gamificación -->
     <header class="app-header">
         <div class="brand-title">
-            <span>♻️</span> EcoTrack AI
+            <span>♻️</span> EcoTrack AI - Py
         </div>
         <div class="gamification-badge" id="badgePuntos">
             🌿 <span id="puntosValor">120</span> XP
@@ -44,23 +44,25 @@
         <div class="card impact-card">
             <h2 class="card-title">📊 Diagnóstico Ecológico</h2>
             
+            <!-- Contenedor donde la IA dibuja las predicciones -->
             <div id="predictionsContainer">
                 <p style="color: var(--text-secondary);">Esperando análisis del modelo de visión artificial...</p>
             </div>
 
+            <!-- Información detallada del impacto ambiental -->
             <div class="impact-detail" id="ecoImpactInfo" style="margin-top: 20px;">
                 <hr style="border-color: var(--border-color); margin-bottom: 15px;">
-                <p><strong>ODS #12:</strong> Garantizar modalidades de consumo y producción sostenibles.</p>
+                <p><strong>ODS #12:</strong> Garantizar modalidades de consumo y producción sostenibles en Paraguay.</p>
             </div>
         </div>
 
     </div>
 
-    <!-- Carga de Librerías TensorFlow.js -->
+    <!-- Carga de Librerías Oficiales de TensorFlow.js de Teachable Machine -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
     
-    <!-- Script de lógica JS -->
+    <!-- Script de lógica en JavaScript -->
     <script src="app.js"></script>
 </body>
 </html>
