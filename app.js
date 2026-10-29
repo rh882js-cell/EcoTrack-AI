@@ -1,4 +1,4 @@
-// La dirección del modelo exportado desde Teachable Machine (puede ser una URL web o una carpeta local)
+// La dirección del modelo exportado desde Teachable Machine
 const URL = "./my_model/";
 
 let model, webcam, labelContainer, maxPredictions;
@@ -40,17 +40,18 @@ async function iniciarEscaner() {
         btn.disabled = true;
     }
 
-    const modelURL = URL + "model.json";
-    const metadataURL = URL + "metadata.json";
+    // Actualizado para apuntar a model_2.json y metadata_2.json según tus archivos
+    const modelURL = URL + "model_2.json";
+    const metadataURL = URL + "metadata_2.json";
 
     try {
         // Cargar el modelo y metadatos de Teachable Machine
         model = await tmImage.load(modelURL, metadataURL);
         maxPredictions = model.getTotalClasses();
 
-        // Configuración de la webcam
-        const flip = true; // si deseas voltear la cámara
-        webcam = new tmImage.Webcam(280, 280, flip); // ancho, alto, voltear
+        // Configuración de la webcam (ancho, alto, voltear)
+        const flip = true; 
+        webcam = new tmImage.Webcam(280, 280, flip);
         await webcam.setup(); // solicitar acceso a la cámara web
         await webcam.play();
         window.requestAnimationFrame(loop);
@@ -92,7 +93,7 @@ async function loop() {
 async function predict() {
     const prediction = await model.predict(webcam.canvas);
     
-    // Si tienes el contenedor de barras personalizadas en tu HTML
+    // Renderizar resultados con las barras de progreso personalizadas
     renderizarResultadosPersonalizados(prediction);
 }
 
@@ -173,7 +174,7 @@ function activarDemo() {
     actualizarImpacto("Plastico");
 }
 
-// Alias para mantener compatibilidad si tu botón HTML llama a init()
+// Alias para mantener compatibilidad con el botón de inicio HTML (`init()`)
 function init() {
     iniciarEscaner();
 }
