@@ -40,7 +40,7 @@ async function iniciarEscaner() {
         btn.disabled = true;
     }
 
-    // Actualizado para apuntar a model_2.json y metadata_2.json según tus archivos
+    // CORRECCIÓN CLAVE: Apuntar exactamente a los nombres de archivo sin espacios
     const modelURL = URL + "model_2.json";
     const metadataURL = URL + "metadata_2.json";
 
