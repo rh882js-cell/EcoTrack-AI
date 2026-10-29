@@ -1,37 +1,38 @@
-// Dirección del modelo exportado desde Teachable Machine
+// Ruta a la carpeta que contiene el modelo exportado de Teachable Machine
 const URL_MODELO = "./my_model/";
 
 let model, webcam, maxPredictions;
 let puntos = 120;
 
-// Base de datos de objetos y elementos comunes en Paraguay
+// Base de datos de objetos y elementos comunes ajustada a Paraguay
 const guiaResiduo = {
     "Plastico": {
         nombreObjeto: "Botella / Envase Plástico (PET)",
-        contenedor: "♻️ Contenedor de Reciclables (Plásticos limpios)",
+        contenedor: "♻️ Reciclables / Contenedor Limpio",
         degradacion: "450 a 1,000 años",
-        co2: "Evita la contaminación de arroyos urbanos en Asunción."
+        co2: "0.05 kg de CO₂ evitado en Asunción"
     },
     "Papel": {
         nombreObjeto: "Cartón / Papel de empaque",
-        contenedor: "📦 Reciclaje de Papel y Cartón (Seco)",
+        contenedor: "📦 Papel y Cartón (Seco y limpio)",
         degradacion: "2 a 5 meses",
-        co2: "Reduce la tala de árboles para la industria papelera."
+        co2: "0.02 kg de CO₂ evitado"
     },
     "Vidrio": {
         nombreObjeto: "Botella o Frasco de Vidrio",
-        contenedor: "🟩 Contenedor Verde (Vidrio reutilizable)",
+        contenedor: "🍾 Vidrio (Reutilizable y limpio)",
         degradacion: "Más de 4,000 años",
-        co2: "100% reciclable infinitas veces sin perder calidad."
+        co2: "0.08 kg de CO₂ evitado"
     },
     "Organico": {
         nombreObjeto: "Residuo Orgánico (Yerba mate, restos de comida)",
-        contenedor: "🌱 Compostaje domiciliario o abono para huertas",
+        contenedor: "🌱 Compostaje domiciliario / Abono para huertas",
         degradacion: "2 a 4 semanas",
-        co2: "Excelente para nutrir la tierra y reducir la basura en Cateura."
+        co2: "Reduce la acumulación de basura en vertederos"
     }
 };
 
+// Carga del modelo e inicialización de la webcam (Lógica base de Teachable Machine)
 async function iniciarEscaner() {
     const btn = document.querySelector('.btn-action');
     btn.innerText = "⏳ Cargando Inteligencia Artificial...";
@@ -41,14 +42,18 @@ async function iniciarEscaner() {
     const metadataURL = URL_MODELO + "metadata.json";
 
     try {
+        // Cargar modelo y metadatos con la librería de TensorFlow
         model = await tmImage.load(modelURL, metadataURL);
         maxPredictions = model.getTotalClasses();
 
-        webcam = new tmImage.Webcam(280, 280, true);
+        // Configuración de la webcam (280x280 px, flip = true)
+        const flip = true;
+        webcam = new tmImage.Webcam(280, 280, flip);
         await webcam.setup();
         await webcam.play();
         window.requestAnimationFrame(loop);
 
+        // Ocultar mensaje y activar vista de cámara y animación
         document.getElementById("placeholderText").style.display = "none";
         document.getElementById("scanOverlay").style.display = "block";
         document.getElementById("scanLine").style.display = "block";
@@ -58,24 +63,28 @@ async function iniciarEscaner() {
 
         btn.innerText = "✅ Escáner Activo";
     } catch (e) {
-        alert("No se encontró el modelo local. Activando modo demostración con objetos de Paraguay.");
+        // Modo demostración por si la carpeta ./my_model/ aún no contiene los archivos
+        alert("No se encontró la carpeta './my_model/'. Modo demostración interactivo activado.");
         activarDemo();
         btn.innerText = "⚡ Activar Cámara IA";
         btn.disabled = false;
     }
 }
 
+// Bucle de animación continuo para actualizar el vídeo y la predicción
 async function loop() {
     webcam.update();
     await predict();
     window.requestAnimationFrame(loop);
 }
 
+// Envía los fotogramas de la cámara al modelo de red neuronal
 async function predict() {
     const prediction = await model.predict(webcam.canvas);
     renderizarResultados(prediction);
 }
 
+// Dibuja los porcentajes y barras de progreso en el HTML
 function renderizarResultados(predicciones) {
     const container = document.getElementById("predictionsContainer");
     container.innerHTML = "";
@@ -86,7 +95,7 @@ function renderizarResultados(predicciones) {
     predicciones.forEach(pred => {
         const porcentaje = (pred.probability * 100).toFixed(0);
         
-        if(pred.probability > mayorProbabilidad) {
+        if (pred.probability > mayorProbabilidad) {
             mayorProbabilidad = pred.probability;
             claseDetectada = pred.className;
         }
@@ -104,11 +113,13 @@ function renderizarResultados(predicciones) {
         `;
     });
 
+    // Si la certeza de la IA supera el 70%, actualiza los datos de impacto ecológico
     if (mayorProbabilidad > 0.70) {
         actualizarImpacto(claseDetectada);
     }
 }
 
+// Actualiza el diagnóstico de impacto ambiental según la clase identificada
 function actualizarImpacto(clase) {
     const infoBox = document.getElementById("ecoImpactInfo");
     
@@ -119,14 +130,15 @@ function actualizarImpacto(clase) {
         <hr style="border-color: var(--border-color); margin-bottom: 15px;">
         <p><strong>Objeto detectado:</strong> ${datos.nombreObjeto}</p>
         <p><strong>Destino sugerido:</strong> ${datos.contenedor}</p>
-        <p><strong>Degradación:</strong> ${datos.degradacion}</p>
+        <p><strong>Tiempo de degradación:</strong> ${datos.degradacion}</p>
         <p><strong>Impacto local:</strong> ${datos.co2}</p>
     `;
 }
 
+// Simulación para demostración en caso de no tener la cámara o el modelo conectado aún
 function activarDemo() {
     renderizarResultados([
-        { className: "Plástico (Botella de Gaseosa)", probability: 0.95 },
+        { className: "Plástico (Botella PET)", probability: 0.95 },
         { className: "Papel / Cartón", probability: 0.03 },
         { className: "Orgánico (Yerba/Comida)", probability: 0.02 }
     ]);
