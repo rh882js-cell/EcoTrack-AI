@@ -1,7 +1,7 @@
-// Ruta a la carpeta que contiene el modelo exportado de Teachable Machine
-const URL_MODELO = "./my_model/";
+// La dirección del modelo exportado desde Teachable Machine (puede ser una URL web o una carpeta local)
+const URL = "./my_model/";
 
-let model, webcam, maxPredictions;
+let model, webcam, labelContainer, maxPredictions;
 let puntos = 120;
 
 // Base de datos de objetos y elementos comunes ajustada a Paraguay
@@ -32,61 +32,75 @@ const guiaResiduo = {
     }
 };
 
-// Carga del modelo e inicialización de la webcam (Lógica base de Teachable Machine)
+// Función principal de inicialización (Conectada con el botón de la interfaz)
 async function iniciarEscaner() {
     const btn = document.querySelector('.btn-action');
-    btn.innerText = "⏳ Cargando Inteligencia Artificial...";
-    btn.disabled = true;
+    if (btn) {
+        btn.innerText = "⏳ Cargando Inteligencia Artificial...";
+        btn.disabled = true;
+    }
 
-    const modelURL = URL_MODELO + "model.json";
-    const metadataURL = URL_MODELO + "metadata.json";
+    const modelURL = URL + "model.json";
+    const metadataURL = URL + "metadata.json";
 
     try {
-        // Cargar modelo y metadatos con la librería de TensorFlow
+        // Cargar el modelo y metadatos de Teachable Machine
         model = await tmImage.load(modelURL, metadataURL);
         maxPredictions = model.getTotalClasses();
 
-        // Configuración de la webcam (280x280 px, flip = true)
-        const flip = true;
-        webcam = new tmImage.Webcam(280, 280, flip);
-        await webcam.setup();
+        // Configuración de la webcam
+        const flip = true; // si deseas voltear la cámara
+        webcam = new tmImage.Webcam(280, 280, flip); // ancho, alto, voltear
+        await webcam.setup(); // solicitar acceso a la cámara web
         await webcam.play();
         window.requestAnimationFrame(loop);
 
-        // Ocultar mensaje y activar vista de cámara y animación
-        document.getElementById("placeholderText").style.display = "none";
-        document.getElementById("scanOverlay").style.display = "block";
-        document.getElementById("scanLine").style.display = "block";
-        
-        const box = document.getElementById("scannerBox");
-        box.appendChild(webcam.canvas);
+        // Ocultar texto de espera y mostrar la cámara en el contenedor
+        const placeholder = document.getElementById("placeholderText");
+        if (placeholder) placeholder.style.display = "none";
 
-        btn.innerText = "✅ Escáner Activo";
+        const scanOverlay = document.getElementById("scanOverlay");
+        const scanLine = document.getElementById("scanLine");
+        if (scanOverlay) scanOverlay.style.display = "block";
+        if (scanLine) scanLine.style.display = "block";
+
+        const webcamContainer = document.getElementById("scannerBox") || document.getElementById("webcam-container");
+        if (webcamContainer) {
+            webcamContainer.appendChild(webcam.canvas);
+        }
+
+        if (btn) btn.innerText = "✅ Escáner Activo";
     } catch (e) {
-        // Modo demostración por si la carpeta ./my_model/ aún no contiene los archivos
-        alert("No se encontró la carpeta './my_model/'. Modo demostración interactivo activado.");
+        console.error("Error al cargar el modelo:", e);
+        alert("No se encontró el modelo local. Activando modo demostración interactivo.");
         activarDemo();
-        btn.innerText = "⚡ Activar Cámara IA";
-        btn.disabled = false;
+        if (btn) {
+            btn.innerText = "⚡ Activar Cámara IA";
+            btn.disabled = false;
+        }
     }
 }
 
-// Bucle de animación continuo para actualizar el vídeo y la predicción
+// Bucle continuo de actualización de la cámara
 async function loop() {
-    webcam.update();
+    webcam.update(); // actualizar fotograma de la webcam
     await predict();
     window.requestAnimationFrame(loop);
 }
 
-// Envía los fotogramas de la cámara al modelo de red neuronal
+// Ejecutar la imagen de la cámara a través del modelo de imagen
 async function predict() {
     const prediction = await model.predict(webcam.canvas);
-    renderizarResultados(prediction);
+    
+    // Si tienes el contenedor de barras personalizadas en tu HTML
+    renderizarResultadosPersonalizados(prediction);
 }
 
-// Dibuja los porcentajes y barras de progreso en el HTML
-function renderizarResultados(predicciones) {
-    const container = document.getElementById("predictionsContainer");
+// Renderizado con barras y diseño avanzado
+function renderizarResultadosPersonalizados(predicciones) {
+    const container = document.getElementById("predictionsContainer") || document.getElementById("label-container");
+    if (!container) return;
+    
     container.innerHTML = "";
 
     let claseDetectada = "";
@@ -101,27 +115,27 @@ function renderizarResultados(predicciones) {
         }
 
         container.innerHTML += `
-            <div class="pred-bar-container">
-                <div class="pred-info">
+            <div class="pred-bar-container" style="margin-bottom: 12px;">
+                <div class="pred-info" style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 5px;">
                     <span>📦 ${pred.className}</span>
                     <span><strong>${porcentaje}%</strong></span>
                 </div>
-                <div class="bar-bg">
-                    <div class="bar-fill" style="width: ${porcentaje}%;"></div>
+                <div class="bar-bg" style="width: 100%; height: 10px; background-color: #1a221e; border-radius: 10px; overflow: hidden;">
+                    <div class="bar-fill" style="height: 100%; width: ${porcentaje}%; background: #00ff87; box-shadow: 0 0 10px #00ff87; border-radius: 10px; transition: width 0.4s ease;"></div>
                 </div>
             </div>
         `;
     });
 
-    // Si la certeza de la IA supera el 70%, actualiza los datos de impacto ecológico
     if (mayorProbabilidad > 0.70) {
         actualizarImpacto(claseDetectada);
     }
 }
 
-// Actualiza el diagnóstico de impacto ambiental según la clase identificada
+// Actualizar los datos ecológicos según la clase detectada
 function actualizarImpacto(clase) {
     const infoBox = document.getElementById("ecoImpactInfo");
+    if (!infoBox) return;
     
     let clave = Object.keys(guiaResiduo).find(k => clase.toLowerCase().includes(k.toLowerCase())) || "Plastico";
     let datos = guiaResiduo[clave];
@@ -135,14 +149,31 @@ function actualizarImpacto(clase) {
     `;
 }
 
-// Simulación para demostración en caso de no tener la cámara o el modelo conectado aún
+// Modo demostración por si no se encuentra la carpeta local del modelo
 function activarDemo() {
-    renderizarResultados([
-        { className: "Plástico (Botella PET)", probability: 0.95 },
-        { className: "Papel / Cartón", probability: 0.03 },
-        { className: "Orgánico (Yerba/Comida)", probability: 0.02 }
-    ]);
+    const container = document.getElementById("predictionsContainer") || document.getElementById("label-container");
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="pred-bar-container" style="margin-bottom: 12px;">
+            <div class="pred-info" style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 5px;">
+                <span>📦 Plástico (Botella de Gaseosa)</span>
+                <span><strong>95%</strong></span>
+            </div>
+            <div class="bar-bg" style="width: 100%; height: 10px; background-color: #1a221e; border-radius: 10px; overflow: hidden;">
+                <div class="bar-fill" style="height: 100%; width: 95%; background: #00ff87; box-shadow: 0 0 10px #00ff87; border-radius: 10px;"></div>
+            </div>
+        </div>
+    `;
     
     puntos += 10;
-    document.getElementById("puntosValor").innerText = puntos;
+    const badgePuntos = document.getElementById("puntosValor");
+    if (badgePuntos) badgePuntos.innerText = puntos;
+
+    actualizarImpacto("Plastico");
+}
+
+// Alias para mantener compatibilidad si tu botón HTML llama a init()
+function init() {
+    iniciarEscaner();
 }
